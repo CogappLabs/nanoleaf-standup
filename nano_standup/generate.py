@@ -29,14 +29,12 @@ def set_static_layout(panel_data):
         effect.append('1')  # TR
 
     message = {
-        "write": {
-            "command": "add",
-            "version": "1.0",
-            "animName": "Test",
-            "animType": "static",
-            "animData": ' '.join(effect),
-            "loop": False,
-        }
+        "command": "add",
+        "version": "1.0",
+        "animName": "Test",
+        "animType": "static",
+        "animData": ' '.join(effect),
+        "loop": False,
     }
 
     return message
