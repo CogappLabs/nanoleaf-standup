@@ -21,6 +21,7 @@ def load_manifest(base_dir):
                     'G': rgb[1],
                     'B': rgb[2],
                 }
+                panel_data['stood_up'] = False
     except yaml.YAMLError as e:
         print('Error loading YAML: {!s}'.format(e))
     except Exception as e:
