@@ -3,6 +3,7 @@ from time import sleep
 from nanoleaf import Aurora
 from nano_standup.credentials import load_manifest
 from nano_standup.generate import set_static_layout
+import random
 
 
 def standups_remaining(participants):
@@ -24,14 +25,26 @@ my_aurora.effect = "Drupal"
 standup_panels = list()
 standup_participants = manifest['panels']
 
+standup_participants_by_name = list()
+
+for name, panel_data in standup_participants.items():
+    standup_participants_by_name.append(name)
+
 print('Initiating standup')
+# print(standup_participants)
 
 while standups_remaining(standup_participants):
-    sleep(1)
-    first = True
-    current_name = None
+    carryon = input('Continue stand up? Y/N: ')
 
-    for name, panel_data in standup_participants.items():
+    if carryon.lower() == 'y':
+        my_aurora.effect = "Drupal"
+        sleep(2)
+        first = True
+    if carryon.lower() == 'n':
+        exit()
+
+    for name in standup_participants_by_name:
+        panel_data = standup_participants[name]
         data = {'id': panel_data['id']}
 
         if first and not panel_data['stood_up']:
