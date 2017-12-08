@@ -3,6 +3,12 @@ nanoleaf:
   token: fadUASgAS&DASGDhA&SDas
 
 panels:
-  joe: 12
-  jane: 34
-  chelsea: 19
+  joe:
+    id: 12
+    rgb: 255 0 255
+  jane:
+    id: 34
+    rgb: 0 0 0
+  chelsea:
+    id: 19
+    rgb: 200 100 0
