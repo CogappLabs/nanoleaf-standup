@@ -1,2 +1,7 @@
 venv
+manifest.yml
 
+.idea
+.DS_Store
+*.pyc
+__pycache__
