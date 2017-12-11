@@ -1,17 +1,19 @@
-import os
-from time import sleep
-from nanoleaf import Aurora
-from nano_standup.credentials import load_manifest
-from nano_standup.generate import set_static_layout
 import random
+import argparse
+from nanoleaf import Aurora
+from nano_standup.utils import *
+from nano_standup.credentials import load_manifest
 
+parser = argparse.ArgumentParser(description='A standup command-line tool for the Nanoleaf.')
+parser.add_argument('--start-standup', action='store_true', help='Start a new standup')
+parser.add_argument('--continue-standup', action='store_true', help='Continue an existing standup')
+parser.add_argument('--reset-standup', action='store_true', help='Reset an existing standup')
+args = parser.parse_args()
 
-def standups_remaining(participants):
-    for name, participant_data in participants.items():
-        if not participant_data['stood_up']:
-            return True
+interactive = True
 
-    return False
+if args.start_standup or args.continue_standup or args.reset_standup:
+    interactive = False
 
 BASE_PATH = os.path.abspath(os.path.dirname(__file__))
 manifest = load_manifest(BASE_PATH)
@@ -25,40 +27,47 @@ my_aurora.effect = "Drupal"
 standup_panels = list()
 standup_participants = manifest['panels']
 
-standup_participants_by_name = list()
+standup_participants_by_name = list(standup_participants.keys())
+random_startup_participants = list()
 
-for name, panel_data in standup_participants.items():
-    standup_participants_by_name.append(name)
+while len(standup_participants_by_name) > 0:
+    name = random.choice(standup_participants_by_name)
+    random_startup_participants.append(name)
+    standup_participants_by_name.remove(name)
 
 print('Initiating standup')
-# print(standup_participants)
 
-while standups_remaining(standup_participants):
-    carryon = input('Continue stand up? Y/N: ')
+if interactive:
+    while standups_remaining(standup_participants):
+        carry_on = input('Continue stand up? Y/N: ')
 
-    if carryon.lower() == 'y':
-        my_aurora.effect = "Drupal"
-        sleep(2)
-        first = True
-    if carryon.lower() == 'n':
-        exit()
+        if carry_on.lower() == 'y':
+            do_standup_interstitial(my_aurora)
+            do_standup_round(my_aurora, random_startup_participants, standup_participants)
+        if carry_on.lower() == 'n':
+            exit()
+else:
+    if args.start_standup:
+        print('Starting the standup')
+        clear_standup()
+        do_standup_interstitial(my_aurora)
+        name = do_standup_round(my_aurora, random_startup_participants, standup_participants)
+        add_standup_participant(name)
+    elif args.continue_standup:
+        print('Continuing the standup')
 
-    for name in standup_participants_by_name:
-        panel_data = standup_participants[name]
-        data = {'id': panel_data['id']}
+        if (len(get_standup_participants()) + 1) == len(standup_participants):
+            clear_php_standup()
 
-        if first and not panel_data['stood_up']:
-            data.update(panel_data['rgb'])
-            standup_participants[name]['stood_up'] = True
-            print('Standing up {!s}'.format(name))
-            first = False
-        else:
-            data.update({
-                'R': 255,
-                'G': 255,
-                'B': 255,
-            })
+        do_standup_interstitial(my_aurora)
+        name = do_standup_round(my_aurora, random_startup_participants, standup_participants, stood_up=get_standup_participants())
+        add_standup_participant(name)
 
-        standup_panels.append(data)
-
-    my_aurora.effect_set_raw(set_static_layout(standup_panels))
+        # If we've gone through all the participants, clear the standup.
+        if len(get_standup_participants()) == len(standup_participants):
+            print('The last person has stood up')
+            clear_standup()
+    elif args.reset_standup:
+        print('Resetting the standup')
+        clear_standup()
+        reset_standup(my_aurora, standup_participants)

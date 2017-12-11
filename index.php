@@ -1,16 +1,30 @@
 <?php
   
+  $action = 'none';
+  $dirname = getcwd();
+  $pythonpath = '/usr/local/bin/python3';
   $standup_file = '/tmp/standup.txt';
-  $started = file_exists($standup_file);
 
   if (isset($_POST['start'])) {
+    $action = 'start';
     file_put_contents($standup_file, 'started');
-    $started = TRUE;
   }
-  elseif ($started && isset($_POST['reset'])) {
-    unlink('/tmp/standup.txt');
-    $started = FALSE;
+  elseif (isset($_POST['continue'])) {
+    $action = 'continue';
   }
+  elseif (isset($_POST['reset'])) {
+    $action = 'reset';
+
+    if (file_exists($standup_file)) {
+        unlink('/tmp/standup.txt');
+    }
+  }
+
+  if ($action !== 'none') {
+    shell_exec("{$pythonpath} {$dirname}/standup.py --{$action}-standup > /dev/null 2>&1");
+  }
+
+  $started = file_exists($standup_file);
 
 ?>
 <!DOCTYPE html>
