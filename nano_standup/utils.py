@@ -1,5 +1,6 @@
 import os
 from time import sleep
+from subprocess import call
 
 STANDUP_FILE = '/tmp/standup_participants.txt'
 PHP_STANDUP_FILE = '/tmp/standup.txt'
@@ -28,7 +29,7 @@ def do_standup_round(aurora, names, participant_data, stood_up=list()):
         if first and name not in stood_up and not panel_data['stood_up']:
             data.update(panel_data['rgb'])
             participant_data[name]['stood_up'] = True
-            print('Standing up {!s}'.format(name))
+            print('Standing up {!s}'.format(participant_data[name]['name']))
             standup_participant = name
             first = False
         else:

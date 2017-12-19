@@ -1,9 +1,10 @@
 <?php
-  
+
   $action = 'none';
   $dirname = getcwd();
   $pythonpath = '/usr/local/bin/python3';
   $standup_file = '/tmp/standup.txt';
+  $participant = '';
 
   if (isset($_POST['start'])) {
     $action = 'start';
@@ -21,7 +22,14 @@
   }
 
   if ($action !== 'none') {
-    shell_exec("{$pythonpath} {$dirname}/standup.py --{$action}-standup > /dev/null 2>&1");
+    $output = shell_exec("{$pythonpath} {$dirname}/standup.py --{$action}-standup");
+    $output = explode("\n", $output);
+
+    foreach ($output as $key => $value) {
+        if (preg_match('/^Standing up (.*)/', $value, $matches)) {
+            $participant = $matches[1];
+        }
+    }
   }
 
   $started = file_exists($standup_file);
@@ -81,6 +89,23 @@
       background: orange;
     }
   </style>
+    <script>
+        window.onload = function() {
+        let participant = <?php print json_encode($participant); ?>;
+
+        if (participant.length) {
+          let msg = new SpeechSynthesisUtterance();
+          msg.volume = 1; // 0 to 1
+          msg.rate = 0.8; // 0.1 to 10
+          msg.pitch = 2; //0 to 2
+          msg.lang = 'en-GB';
+
+          msg.text = participant;
+
+          speechSynthesis.speak(msg);
+        }
+      };
+    </script>
 </head>
 <body>
   <form class="standup" action="." method="POST">
