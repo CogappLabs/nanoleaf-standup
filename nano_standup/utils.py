@@ -14,8 +14,8 @@ def standups_remaining(participants):
 
 
 def do_standup_interstitial(aurora):
-    aurora.effect = 'Disco Mode'
-    sleep(2)
+    aurora.effect = 'Blockbusters'
+    sleep(3)
 
 def do_standup_round(aurora, names, participant_data, stood_up=list()):
     first = True

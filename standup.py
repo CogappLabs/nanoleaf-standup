@@ -22,7 +22,7 @@ print('Connecting to the Nanoleaf at {!s}'.format(manifest['nanoleaf']['ip']))
 
 my_aurora = Aurora(manifest['nanoleaf']['ip'], manifest['nanoleaf']['token'])
 my_aurora.on = True
-my_aurora.effect = "Drupal"
+my_aurora.effect = "Blockbusters"
 
 standup_panels = list()
 standup_participants = manifest['panels']
